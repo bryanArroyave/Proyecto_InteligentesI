@@ -8,10 +8,11 @@ public class Grafo {
 
     private LinkedList<Nodo> V;
     private LinkedList<Arista> A;
-
+    public int cant_bits;
     int Matriz[][];
 
     public Grafo() {
+        cant_bits = 0;
         V = new LinkedList<>();
         A = new LinkedList<>();
         cambiarMatriz();
@@ -21,6 +22,23 @@ public class Grafo {
         Matriz = new int[V.size()][V.size()];
         llenarMatriz();
         mostrarInfo();
+    }
+
+    public void calcularCantidadBits() {
+        cant_bits = (int) Math.ceil(Math.log(V.size()) / Math.log(2));
+    }
+
+    public boolean existeNodo(String binario) {
+        for (Nodo nodo : V) {
+            if (nodo.binario.equals(binario)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int calcularMaximoBits() {
+        return cant_bits * V.size();
     }
 
     private void llenarMatriz() {

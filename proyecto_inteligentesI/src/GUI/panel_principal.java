@@ -79,7 +79,14 @@ public class panel_principal extends JPanel implements ActionListener {
     }
 
     private void solucionar() {
-        System.out.println("solucionando");
+
+        btn_agregarNodo.setEnabled(false);
+        btn_agregarNodo.setBackground(new Color(150, 150, 150));
+
+        p_grafo.grafo.getV().forEach((nodo) -> {
+            nodo.cambiarBinario(p_grafo.grafo.cant_bits);
+        });
+       
     }
 
     @Override
