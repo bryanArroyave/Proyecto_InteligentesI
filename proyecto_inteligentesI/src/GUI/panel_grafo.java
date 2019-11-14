@@ -57,7 +57,7 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
             return (int) (Math.random() * 10 + 1);
         } else if (Opcion.MANUAL == opcion) {
             return Integer.parseInt(
-                    JOptionPane.showInputDialog(null, "ingrese peso de " + o.Nombre + " a " + d.Nombre));
+                    JOptionPane.showInputDialog(null, "ingres e peso de " + o.Nombre + " a " + d.Nombre));
         }
         return -1;
 
