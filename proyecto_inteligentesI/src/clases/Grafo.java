@@ -11,6 +11,8 @@ public class Grafo {
     public int cant_bits;
     int Matriz[][];
 
+    public static int maxPeso;
+
     public Grafo() {
         cant_bits = 0;
         V = new LinkedList<>();
@@ -37,6 +39,11 @@ public class Grafo {
         return false;
     }
 
+    public void calcularMaxPeso() {
+        int maxPeso = 10;
+        this.maxPeso = (this.V.size() - 1) * maxPeso;
+    }
+
     public int calcularMaximoBits() {
         return cant_bits * V.size();
     }
@@ -45,7 +52,7 @@ public class Grafo {
         for (int i = 0; i < Matriz.length; i++) {
             for (int j = 0; j < Matriz[i].length; j++) {
                 if (i != j) {
-                    Arista arista = buscarArista("C" + (i + 1), "C" + (j + 1));
+                    Arista arista = buscarArista("C" + (i), "C" + (j));
                     if (arista != null) {
                         Matriz[i][j] = arista.distancia;
                     }
@@ -60,11 +67,11 @@ public class Grafo {
         String dato = "\t";
 
         for (int i = 0; i < V.size(); i++) {
-            dato += "C" + (i + 1) + "\t";
+            dato += "C" + (i) + "\t";
         }
 
         for (int i = 0; i < V.size(); i++) {
-            dato += "\nC" + (i + 1);
+            dato += "\nC" + (i);
             for (int j = 0; j < V.size(); j++) {
                 dato += "\t" + Matriz[i][j];
             }

@@ -76,19 +76,17 @@ public class panel_principal extends JPanel implements ActionListener {
     }
 
     private void solucionar() {
-
+        p_grafo.grafo.calcularMaxPeso();
         btn_solucionar.setBackground(Color.green);
         p_grafo.grafo.calcularCantidadBits();
         p_grafo.grafo.getV().forEach((nodo) -> {
-          
             nodo.cambiarBinario(p_grafo.grafo.cant_bits);
         });
         btn_solucionar.setEnabled(false);
-        Logica logica = new Logica(p_grafo.grafo);
-        logica.generarHijos();
-        logica.mostrarHijos();
+        p_grafo.dibujando = false;
+        Logica logica = new Logica(p_grafo.grafo, p_informacion);
 
-        p_informacion.adicionarLabel(logica.obtenerInfoFitness(), new Rectangle(10, 50, 1000, 200));
+        logica.algoritmoGenetico();
 
     }
 
