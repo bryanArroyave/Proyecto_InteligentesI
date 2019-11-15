@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 public class Nodo {
 
@@ -27,13 +28,15 @@ public class Nodo {
     }
 
     public void cambiarBinario(int cantidad) {
-        binario = Integer.toBinaryString(-1 + Integer.parseInt(Nombre.substring(1, Nombre.length())));
+        binario = Integer.toBinaryString(Integer.parseInt(Nombre.substring(1, Nombre.length())));
         String ceros = "";
         for (int i = 0; i < (cantidad - binario.trim().length()); i++) {
             ceros += "0";
 
         }
         binario = ceros + binario;
+
+       
     }
 
     public boolean comprobarUbicacion(Rectangle c) {

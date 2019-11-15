@@ -74,7 +74,7 @@ public class Grafo {
         System.out.println("=================================================================================");
     }
 
-    private Arista buscarArista(String o, String d) {
+    public Arista buscarArista(String o, String d) {
         for (Arista arista : A) {
             if (buscarNodo(o) == arista.origen && buscarNodo(d) == arista.destino) {
                 return arista;
@@ -83,7 +83,16 @@ public class Grafo {
         return null;
     }
 
-    private Nodo buscarNodo(String nombre) {
+    public Nodo buscarNodoBinario(String binario) {
+        for (Nodo nodo : V) {
+            if (nodo.binario.equals(binario)) {
+                return nodo;
+            }
+        }
+        return null;
+    }
+
+    public Nodo buscarNodo(String nombre) {
 
         for (Nodo nodo : V) {
             if (nodo.Nombre.equals(nombre)) {

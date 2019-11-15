@@ -21,7 +21,7 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
     private int ancho, alto, x, y;
     public boolean dibujando;
 
-    private static int ID = 1;
+    private static int ID = 0;
     Grafo grafo;
     private Rectangle siguiente;
 
@@ -30,9 +30,9 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
         this.alto = alto;
         this.x = x;
         this.y = y;
-
-        siguiente = new Rectangle();
-        grafo = new Grafo();
+        this.dibujando = true;
+        this.siguiente = new Rectangle();
+        this.grafo = new Grafo();
 
         configurarPanel();
         addMouseListener(this);

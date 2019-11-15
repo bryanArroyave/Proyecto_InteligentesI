@@ -3,6 +3,7 @@ package GUI;
 import clases.Arista;
 import clases.Opcion;
 import clases.Grafo;
+import clases.Logica;
 import clases.Nodo;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -23,7 +24,7 @@ public class panel_principal extends JPanel implements ActionListener {
     panel_informacion p_informacion;
     panel_grafo p_grafo;
 
-    private JButton btn_agregarNodo;
+    //private JButton btn_agregarNodo;
     private JButton btn_solucionar;
 
     private final int ancho;
@@ -45,16 +46,13 @@ public class panel_principal extends JPanel implements ActionListener {
         p_grafo = new panel_grafo((3 * (int) ancho / 4) - 300, alto - 125, 50, 50);
         p_informacion = new panel_informacion((int) ancho / 4, alto, 3 * (int) ancho / 4, 0);
 //================================BOTONES===================================================
-        btn_agregarNodo = new JButton();
+
         btn_solucionar = new JButton();
 
-        btn_agregarNodo.setBounds((3 * (int) ancho / 4) - 220, (alto / 2) - 50, 25, 25);
         btn_solucionar.setBounds((3 * (int) ancho / 4) - 220, (alto / 2) + 50, 25, 25);
 
-        btn_agregarNodo.setBackground(Color.green);
         btn_solucionar.setBackground(Color.red);
 
-        btn_agregarNodo.addActionListener(this);
         btn_solucionar.addActionListener(this);
 
     }
@@ -70,7 +68,6 @@ public class panel_principal extends JPanel implements ActionListener {
     private void agregarComponentes() {
         add(p_informacion);
         add(p_grafo);
-        add(btn_agregarNodo);
         add(btn_solucionar);
     }
 
@@ -80,20 +77,25 @@ public class panel_principal extends JPanel implements ActionListener {
 
     private void solucionar() {
 
-        btn_agregarNodo.setEnabled(false);
-        btn_agregarNodo.setBackground(new Color(150, 150, 150));
-
+        btn_solucionar.setBackground(Color.green);
+        p_grafo.grafo.calcularCantidadBits();
         p_grafo.grafo.getV().forEach((nodo) -> {
+          
             nodo.cambiarBinario(p_grafo.grafo.cant_bits);
         });
-       
+        btn_solucionar.setEnabled(false);
+        Logica logica = new Logica(p_grafo.grafo);
+        logica.generarHijos();
+        logica.mostrarHijos();
+
+        p_informacion.adicionarLabel(logica.obtenerInfoFitness(), new Rectangle(10, 50, 1000, 200));
+
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btn_agregarNodo) {
-            agregarNodo();
-        } else if (e.getSource() == btn_solucionar) {
+
+        if (e.getSource() == btn_solucionar) {
             solucionar();
         }
     }
