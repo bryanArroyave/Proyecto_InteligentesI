@@ -1,6 +1,7 @@
 package GUI;
 
 import java.awt.Toolkit;
+import java.util.Arrays;
 import javax.swing.JFrame;
 
 public class Main extends JFrame {
@@ -41,10 +42,6 @@ public class Main extends JFrame {
     public static void main(String[] args) {
         Main main = new Main();
         main.setVisible(true);
-
-        String a = "1010010010";
-        
-       
 
     }
 //=========================================================================

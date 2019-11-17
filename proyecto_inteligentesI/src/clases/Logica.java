@@ -16,9 +16,9 @@ public class Logica implements Runnable {
     boolean reepintar;
     Thread thread;
 
-    private int cantIteraciones = 15;
+    private int cantIteraciones = 1000;
     private final Grafo G;
-    LinkedList<Hijo> hijos;
+    LinkedList<Hijo2> hijos;
     LinkedList<Nodo> nodosVisitados;
     panel_informacion p_informacion;
     String infoFitness;
@@ -33,35 +33,183 @@ public class Logica implements Runnable {
         thread = new Thread(this);
     }
 
-    private void seleccionar() {
-
-    }
-
     public void algoritmoGenetico() {
         generarHijos();
-        //mostrarHijos();
 
-        while (!terminar()) {
-            infoFitness = obtenerInfoFitness();
-
-            System.out.println(infoFitness);
-            //================================Mostrar datos en el panel====================================
-            reepintar = true;
-            //=============================================================================================
-            LinkedList<Hijo> seleccionados = this.seleccion();
-            //=============================================================================================
-            LinkedList<Hijo> aptos = this.seleccionReproduccion(seleccionados);
-            LinkedList<Hijo> clones = this.reproduccion(aptos);
-            LinkedList<Hijo> Cruzados = this.crossover(aptos, clones);
-            LinkedList<Hijo> mutados = this.mutacion(Cruzados);
-
+        while (true) {
+            LinkedList<Hijo2> seleccionados = seleccionar(hijos);
+            if (terminar()) {
+                break;
+            }
+            System.out.println("");
+            System.out.println("========================Seleccionados========================");
+            for (Hijo2 s : seleccionados) {
+                System.out.println(s.getCromosoma() + " " + s.getRuta() + " " + s.getAptitud());
+            }
+            System.out.println("=============================================================");
+            System.out.println("");
+            LinkedList<Hijo2> cruzados = cruzar(seleccionados);
+            System.out.println("");
+            System.out.println("=========================Cruzados===========================");
+            for (Hijo2 s : cruzados) {
+                System.out.println(s.getCromosoma() + " " + s.getRuta() + " " + s.getAptitud());
+            }
+            System.out.println("=============================================================");
+            System.out.println("");
+            LinkedList<Hijo2> mutados = mutar(cruzados);
+            System.out.println("");
+            System.out.println("=========================mutados===========================");
+            for (Hijo2 s : mutados) {
+                System.out.println(s.getCromosoma() + " " + s.getRuta() + " " + s.getAptitud());
+            }
+            System.out.println("=============================================================");
+            System.out.println("");
             hijos = mutados;
-
         }
     }
 
-    private boolean terminar() {
+    private LinkedList<Hijo2> mutar(LinkedList<Hijo2> cruzados) {
+        //Se añaden algunas variaciones al azar que no estaban en los padres
+        //porcentaje de mutacion entre 20 y 30%
+        //De acá vuelve y se llama a la funcion evaluacion
+        for (int i = 0; i < cruzados.size(); i++) {
 
+            double probabilidad = (Math.random());
+
+            if (probabilidad <= porcentajeMutacion) {
+                String nuevoCromosoma = cruzados.get(i).getCromosoma();
+                int posAleatoria = (int) (Math.random() * this.G.calcularMaximoBits());
+                int gen = nuevoCromosoma.charAt(posAleatoria);
+
+                int nuevoGen = 1 - gen;
+
+                nuevoCromosoma = reemplazarBit(nuevoCromosoma, posAleatoria);
+                cruzados.get(i).setCromosoma(nuevoCromosoma);
+            }
+
+            String info[] = obtenerInformacion();
+            cruzados.get(i).setPeso(Integer.parseInt(obtenerInformacion()[1]));
+            cruzados.get(i).setRuta(info[0]);
+
+        }
+        return cruzados;
+
+    }
+
+    private LinkedList<Hijo2> cruzar(LinkedList<Hijo2> seleccionados) {
+
+        for (int i = 0; i < cantHijos; i += 2) {
+            Hijo2 padre1 = seleccionados.get(i);
+            Hijo2 padre2 = seleccionados.get(i + 1);
+
+            int posRandom = posicionRandom();
+
+            String nuevoCromosoma1 = "";
+            String nuevoCromosoma2 = "";
+
+            for (int j = 0; j < posRandom; j++) {
+                nuevoCromosoma1 += padre1.getCromosoma().charAt(j);
+                nuevoCromosoma2 += padre2.getCromosoma().charAt(j);
+            }
+            for (int j = posRandom; j < this.G.calcularMaximoBits(); j++) {
+                nuevoCromosoma1 += padre2.getCromosoma().charAt(j);
+                nuevoCromosoma2 += padre1.getCromosoma().charAt(j);
+            }
+
+            seleccionados.get(i).setCromosoma(nuevoCromosoma1);
+            seleccionados.get(i + 1).setCromosoma(nuevoCromosoma2);
+
+            String info[] = obtenerInformacion();
+            seleccionados.get(i).setPeso(Integer.parseInt(obtenerInformacion()[1]));
+            seleccionados.get(i).setRuta(info[0]);
+
+        }
+        return seleccionados;
+    }
+
+    private void calcularAptitud() {
+        for (Hijo2 hijo : hijos) {
+            hijo.setAptitud(hijo.getEvaluacion() / this.sacarPromedio());
+        }
+    }
+
+    private LinkedList<Hijo2> adicionarEnteros(LinkedList<Hijo2> seleccionados) {
+        for (Hijo2 hijo : hijos) {
+            for (int i = 0; i < (int) hijo.getAptitud(); i++) {
+                seleccionados.add(hijo);
+            }
+        }
+        return seleccionados;
+    }
+
+    private LinkedList<Hijo2> adicionarDecimal(LinkedList<Hijo2> seleccionados) {
+        int tamNuevos = seleccionados.size();
+        for (int i = 0; i < cantHijos - tamNuevos; i++) {
+            int pos = escogerHijoRuleta(llenarRuleta());
+            seleccionados.add(hijos.get(pos));
+        }
+        return seleccionados;
+    }
+
+    private LinkedList<Hijo2> seleccionar(LinkedList<Hijo2> hijos) {
+        LinkedList<Hijo2> seleccionados = new LinkedList<>();
+        funcionEvaluacion(hijos);
+        this.ordenarEvaluacion();
+
+        this.calcularAptitud();
+
+        /*     for (Hijo2 hijo : hijos) {
+            System.out.println(hijo.getCromosoma() + " " + hijo.getAptitud());
+        }*/
+        seleccionados = adicionarEnteros(seleccionados);
+        seleccionados = adicionarDecimal(seleccionados);
+
+        return seleccionados;
+    }
+
+    private float[] crearRuleta() {
+        float ruleta[] = new float[cantHijos];
+
+        return ruleta;
+    }
+
+    private float obtenerDecimal(float numero) {
+        String str = String.valueOf(numero);
+        return Float.parseFloat(str.substring(str.indexOf('.')));
+    }
+
+    private float[] llenarRuleta() {
+        float ruleta[] = crearRuleta();
+
+        ruleta[0] = obtenerDecimal(hijos.get(0).getEvaluacion());
+        for (int i = 1; i < ruleta.length; i++) {
+            ruleta[i] = ruleta[i - 1] + obtenerDecimal(hijos.get(i).getEvaluacion());
+        }
+        String dato = "";
+        for (int i = 0; i < ruleta.length; i++) {
+            dato += "|" + ruleta[i] + "|";
+        }
+//        System.out.println("=======================================");
+//        System.out.println(dato);
+        return ruleta;
+    }
+
+    private int escogerHijoRuleta(float[] ruleta) {
+
+        int posicion = 0;
+        float aleatorio = (float) (Math.random() * ruleta[ruleta.length - 1]);
+//        System.out.println("Aleatorio " + aleatorio);
+        for (int i = 0; i < ruleta.length - 1; i++) {
+            if (aleatorio > ruleta[i + 1]) {
+                posicion = i + 1;
+            }
+        }
+
+        return posicion;
+    }
+
+    private boolean terminar() {
+        System.out.println("Porcentaje " + porcentajeCoincidencias() + "%");
         if (porcentajeCoincidencias() >= 90 || cantIteraciones == 0) {
             return true;
         }
@@ -70,20 +218,30 @@ public class Logica implements Runnable {
     }
 
     private float porcentajeCoincidencias() {
-        int max = hijos.get(0).getAptitud();
-        int t_coincicencia;
+        float max = hijos.get(0).getEvaluacion();
+        int t_coincicencia = 0;
+
         for (int i = 1; i < hijos.size(); i++) {
-            if ((t_coincicencia = totalCoincidencia(hijos.get(i))) > max) {
-                max = t_coincicencia;
+            if (hijos.get(i).getEvaluacion() > max) {
+                max = hijos.get(i).getEvaluacion();
             }
         }
-        return max * 100 / 8;
+        if (max != 0) {
+            for (int i = 0; i < hijos.size(); i++) {
+                if (hijos.get(i).getEvaluacion() == max) {
+                    t_coincicencia++;
+                }
+            }
+            return t_coincicencia * 100 / cantHijos;
+        } else {
+            return 0;
+        }
     }
 
-    private int totalCoincidencia(Hijo hijo) {
+    private int totalCoincidencia(Hijo2 hijo) {
 
         int totalCoincidencia = 0;
-        for (Hijo h : hijos) {
+        for (Hijo2 h : hijos) {
             if (h != hijo) {
                 if (h.getAptitud() == hijo.getAptitud()) {
                     totalCoincidencia++;
@@ -93,30 +251,28 @@ public class Logica implements Runnable {
         return totalCoincidencia;
     }
 
-    private String obtenerInfoFitness() {
+    private String funcionEvaluacion(LinkedList<Hijo2> hijos) {
         String dato = "<html><body> Hijos <br> <br>";
         String dato2 = "";
-        for (Hijo hijo : hijos) {
-            nodosVisitados = nodosVisitados(hijo.getCromosoma());
-            int peso = Integer.parseInt(obtenerInformacion()[1]);
-            String ruta = obtenerInformacion()[0];
-            hijo.setPeso(peso);
-            hijo.setRuta(ruta);
-            hijo.calcularAptitud();
 
-            dato += hijo.getCromosoma() + " " + nodosVisitados.size() + " -> " + ruta + "->" + peso + " <br>";
-            dato2 += hijo.getCromosoma() + " " + nodosVisitados.size() + " -> " + ruta + "->" + peso + " \n";
+        for (Hijo2 hijo : hijos) {
+            nodosVisitados = nodosVisitados(hijo.getCromosoma());
+
+          
+
+//            dato += hijo.getCromosoma() + " " + nodosVisitados.size() + " -> " + ruta + "->" + peso + " <br>";
+//            dato2 += hijo.getCromosoma() + " " + nodosVisitados.size() + " -> " + ruta + "->" + peso + " \n";
 
         }
-        System.out.println("==========================================");
-
-        System.out.println(dato2);
-        System.out.println("==========================================");
+//        System.out.println("==========================================");
+//
+//        System.out.println(dato2);
+//        System.out.println("==========================================");
         return dato + "</body></html>";
     }
 
-    private void ordenarAptitud() {
-        Collections.sort(hijos, (a, b) -> a.getAptitud() < b.getAptitud() ? 1 : a.getAptitud() == b.getAptitud() ? 0 : -1);
+    private void ordenarEvaluacion() {
+        Collections.sort(hijos, (a, b) -> a.getEvaluacion() < b.getEvaluacion() ? 1 : a.getEvaluacion() == b.getEvaluacion() ? 0 : -1);
     }
 
     private String[] obtenerInformacion() {
@@ -125,9 +281,14 @@ public class Logica implements Runnable {
         String ruta = "";
         int peso = 0;
         if (nodosVisitados.size() > 1) {
+
             for (int i = 0; i < nodosVisitados.size() - 1; i++) {
                 Arista a = G.buscarArista(nodosVisitados.get(i).Nombre, nodosVisitados.get(i + 1).Nombre);
-                ruta = ruta + ("[" + a.origen.Nombre + "," + a.destino.Nombre + "]");
+                if (i == 0) {
+                    ruta = a.origen.Nombre;
+                }
+
+                ruta = ruta + "-" + a.destino.Nombre;
                 peso += a.distancia;
 
             }
@@ -146,17 +307,17 @@ public class Logica implements Runnable {
             for (int j = 0; j < G.cant_bits * G.getV().size(); j++) {
                 cromosoma += (int) (Math.round(Math.random()));
             }
-            hijos.add(new Hijo(cromosoma));
+            hijos.add(new Hijo2(cromosoma));
         }
 
     }
 
     private void mostrarHijos() {
-        System.out.println("=============================hijos========================");
-        for (Hijo hijo : hijos) {
-            System.out.println(hijo.getCromosoma());
-        }
-        System.out.println("==========================================================");
+//        System.out.println("=============================hijos========================");
+//        for (Hijo2 hijo : hijos) {
+//            System.out.println(hijo.getCromosoma());
+//        }
+//        System.out.println("==========================================================");
     }
 
     private LinkedList<Nodo> nodosVisitados(String hijo) {
@@ -169,6 +330,7 @@ public class Logica implements Runnable {
             }
             try {
                 adicionarVisitados(G.buscarNodoBinario(nodoActual), nodoActual, nodosVisitados);
+
             } catch (Exception e) {
 
             }
@@ -188,95 +350,18 @@ public class Logica implements Runnable {
         }
     }
 
-    private LinkedList<Hijo> seleccion() {
-        //Se eligen los individuos con el fitness más alto
-        //se requieren mas de dos individuos, para este caso escogemos 3
-        this.ordenarAptitud();
-        LinkedList<Hijo> seleccionados = new LinkedList<>();
-        for (int i = 0; i < 3; i++) {
-            seleccionados.add(hijos.get(i));
-        }
-        return seleccionados;
-    }
+    private float sacarPromedio() {
+        float promedio = 0f;
 
-    private LinkedList<Hijo> seleccionReproduccion(LinkedList<Hijo> hijosSeleccionados) {
-        Random rand = new Random();
-        LinkedList<Hijo> hijosReproduccion = new LinkedList<>();
-        for (int i = 0; i < 2; i++) {
-            int aleatorio = rand.nextInt(hijosSeleccionados.size());
-            Hijo hijo = hijosSeleccionados.get(aleatorio);
-            hijosReproduccion.add(hijo);
-            hijosSeleccionados.remove(hijo);
+        for (Hijo2 hijo : hijos) {
+            promedio += hijo.getEvaluacion();
         }
-        return hijosReproduccion;
-    }
 
-    private LinkedList<Hijo> clonar(Hijo hijo) throws CloneNotSupportedException {
-        LinkedList<Hijo> clones = new LinkedList<>();
-        for (int i = 0; i < this.cantHijos / 2; i++) {
-            clones.add(hijo.clone());
-        }
-        return clones;
-    }
-
-    private LinkedList<Hijo> reproduccion(LinkedList<Hijo> hijosReproduccion) {
-        //Se crea una nueva poblacion copiando los "padres"
-        LinkedList<Hijo> hijosClonados = new LinkedList<>();
-        hijosReproduccion.forEach((hijo) -> {
-            try {
-                hijosClonados.addAll(this.clonar(hijo));
-            } catch (CloneNotSupportedException ex) {
-            }
-        });
-        return hijosClonados;
+        return promedio / hijos.size();
     }
 
     private int posicionRandom() {
         return (int) (Math.random() * this.G.calcularMaximoBits() - 1) + 1;
-    }
-
-    private LinkedList<Hijo> crossover(LinkedList<Hijo> padres, LinkedList<Hijo> hijosClonados) {
-        //Se mezclan las caracteristicas de los padres entre los individuos de la poblacion
-
-        for (Hijo hijosClonado : hijosClonados) {
-            int posRandom = posicionRandom();
-
-            String nuevoCromosoma = "";
-
-            for (int i = 0; i < posRandom; i++) {
-                nuevoCromosoma += padres.get(0).getCromosoma().charAt(i);
-            }
-            for (int i = posRandom; i < this.G.calcularMaximoBits(); i++) {
-                nuevoCromosoma += padres.get(1).getCromosoma().charAt(i);
-            }
-
-            hijosClonado.setCromosoma(nuevoCromosoma);
-        }
-        return hijosClonados;
-
-    }
-
-    private LinkedList<Hijo> mutacion(LinkedList<Hijo> nuevaGeneracion) {
-        //Se añaden algunas variaciones al azar que no estaban en los padres
-        //porcentaje de mutacion entre 20 y 30%
-        //De acá vuelve y se llama a la funcion fitness
-        for (int i = 0; i < nuevaGeneracion.size(); i++) {
-
-            double probabilidad = (Math.random());
-
-            if (probabilidad <= porcentajeMutacion) {
-                String nuevoCromosoma = nuevaGeneracion.get(i).getCromosoma();
-                int posAleatoria = (int) (Math.random() * this.G.calcularMaximoBits());
-                int gen = nuevoCromosoma.charAt(posAleatoria);
-
-                int nuevoGen = 1 - gen;
-
-                nuevoCromosoma = reemplazarBit(nuevoCromosoma, posAleatoria);
-                nuevaGeneracion.get(i).setCromosoma(nuevoCromosoma);
-            }
-        }
-        return nuevaGeneracion;
-
     }
 
     private String reemplazarBit(String nuevoCromosoma, int posAleatoria) {

@@ -12,18 +12,20 @@ public class Grafo {
     int Matriz[][];
 
     public static int maxPeso;
+    public static int maxCantNodos;
 
     public Grafo() {
         cant_bits = 0;
         V = new LinkedList<>();
         A = new LinkedList<>();
         cambiarMatriz();
+
     }
 
     public void cambiarMatriz() {
         Matriz = new int[V.size()][V.size()];
         llenarMatriz();
-        mostrarInfo();
+        // mostrarInfo();
     }
 
     public void calcularCantidadBits() {
@@ -37,6 +39,12 @@ public class Grafo {
             }
         }
         return false;
+    }
+
+    public void calcularmaxCantNodos() {
+
+        this.maxCantNodos = this.V.size();
+
     }
 
     public void calcularMaxPeso() {

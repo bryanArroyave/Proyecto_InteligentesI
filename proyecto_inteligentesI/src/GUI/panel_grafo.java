@@ -22,7 +22,7 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
     public boolean dibujando;
 
     private static int ID = 0;
-    Grafo grafo;
+    public static Grafo grafo;
     private Rectangle siguiente;
 
     public panel_grafo(int ancho, int alto, int x, int y) {
@@ -37,6 +37,11 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
         configurarPanel();
         addMouseListener(this);
         addMouseMotionListener(this);
+
+        dibujarNodo(new Point(50, 50));
+        dibujarNodo(new Point(450, 50));
+        dibujarNodo(new Point(350, 450));
+        dibujarNodo(new Point(50, 350));
     }
 
     private void agregarArista(Nodo c) {
@@ -63,7 +68,7 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
 
     }
 
-    private void colocarCiudad(Rectangle r) throws Exception {
+    private void agregarNodo(Rectangle r) throws Exception {
         if (grafo.puedeColocar(r)) {
             Nodo c = new Nodo(r, "C" + ID);
             ID++;
@@ -110,10 +115,10 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
         this.siguiente = siguiente;
     }
 
-    private void dibujarCiudad(Point punto) {
+    private void dibujarNodo(Point punto) {
         Rectangle nuevo_nodo = new Rectangle(punto.x, punto.y, 50, 50);
         try {
-            colocarCiudad(nuevo_nodo);
+            agregarNodo(nuevo_nodo);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -125,7 +130,7 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
         if (me.getButton() == 1) {
             if (isDibujando()) {
 
-                dibujarCiudad(me.getPoint());
+                dibujarNodo(me.getPoint());
             }
         }
     }

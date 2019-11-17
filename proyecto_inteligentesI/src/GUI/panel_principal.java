@@ -1,6 +1,7 @@
 package GUI;
 
 import clases.Arista;
+import clases.Genetico;
 import clases.Opcion;
 import clases.Grafo;
 import clases.Logica;
@@ -77,6 +78,8 @@ public class panel_principal extends JPanel implements ActionListener {
 
     private void solucionar() {
         p_grafo.grafo.calcularMaxPeso();
+        p_grafo.grafo.calcularmaxCantNodos();
+
         btn_solucionar.setBackground(Color.green);
         p_grafo.grafo.calcularCantidadBits();
         p_grafo.grafo.getV().forEach((nodo) -> {
@@ -86,7 +89,9 @@ public class panel_principal extends JPanel implements ActionListener {
         p_grafo.dibujando = false;
         Logica logica = new Logica(p_grafo.grafo, p_informacion);
 
-        logica.algoritmoGenetico();
+        // logica.algoritmoGenetico();
+        Genetico g = new Genetico();
+        g.algoritmoGenetico();
 
     }
 

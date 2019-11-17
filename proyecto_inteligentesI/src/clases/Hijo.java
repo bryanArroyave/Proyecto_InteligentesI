@@ -1,21 +1,67 @@
 package clases;
 
-import java.util.Comparator;
 import java.util.LinkedList;
+import static GUI.panel_grafo.grafo;
 
-public class Hijo implements Cloneable {
+public final class Hijo {
 
     private String cromosoma;
-    private String ruta;
-    private LinkedList<Nodo> rutaN;
+    private LinkedList<String> ruta;
+    private float aptitud;
     private int peso;
-    private int aptitud;
+    private float evaluacion;
 
     public Hijo(String cromosoma) {
         this.cromosoma = cromosoma;
-        this.ruta = "";
         this.peso = 0;
-        this.rutaN = new LinkedList<>();
+        this.aptitud = 0;
+        this.evaluacion = 0;
+        this.ruta = new LinkedList<>();
+        calcularRuta();
+        calcularPeso();
+        calcularEvalucion();
+        obtenerInformacion();
+
+    }
+
+    private void calcularEvalucion() {
+        evaluacion = 0f;
+        float pesoNormalizado = ((float) this.peso / (float) grafo.maxPeso);
+        float visitadosNormalizado = ((float) this.ruta.size()) / (float) grafo.maxCantNodos;
+        this.evaluacion = (float) (pesoNormalizado*0.10 + visitadosNormalizado*0.90);
+
+    }
+
+    private void calcularPeso() {
+        String o = "", d = "";
+        peso = 0;
+        for (int i = 0; i < this.ruta.size() - 1; i++) {
+            o = grafo.buscarNodo(this.ruta.get(i)).Nombre;
+            d = grafo.buscarNodo(this.ruta.get(i + 1)).Nombre;
+
+            this.peso += grafo.buscarArista(o, d).distancia;
+
+        }
+
+    }
+
+    private void calcularRuta() {
+        LinkedList<String> visitados = new LinkedList<>();
+        ruta.clear();
+        for (int i = 0, j = 1; i < grafo.calcularMaximoBits(); i += grafo.cant_bits, j++) {
+            String nodoActual = "";
+
+            for (int k = i; k < j * grafo.cant_bits; k++) {
+
+                nodoActual += cromosoma.charAt(k);
+            }
+            if (!visitados.contains(nodoActual) && grafo.existeNodo(nodoActual)) {
+                visitados.add(nodoActual);
+
+                ruta.add(grafo.buscarNodoBinario(nodoActual).Nombre);
+
+            }
+        }
     }
 
     /**
@@ -30,37 +76,30 @@ public class Hijo implements Cloneable {
      */
     public void setCromosoma(String cromosoma) {
         this.cromosoma = cromosoma;
+        calcularRuta();
+        calcularPeso();
+        calcularEvalucion();
+        obtenerInformacion();
     }
 
     /**
      * @return the ruta
      */
     public String getRuta() {
-        return ruta;
+
+        String dato = "|";
+        for (String s : ruta) {
+            dato = dato + s + "|";
+
+        }
+        return dato;
     }
 
     /**
-     * @param ruta the ruta to set
+     * @return the aptitud
      */
-    public void setRuta(String ruta) {
-        this.ruta = ruta;
-    }
-
-    public int compare(Hijo obj1, Hijo obj2) {
-        Integer p1 = obj1.peso;
-        Integer p2 = obj2.peso;
-
-        if (p1 > p2) {
-            return 1;
-        } else if (p1 < p2) {
-            return -1;
-        } else {
-            return 0;
-        }
-    }
-
-    public int calcularAptitud() {
-        return (int) (peso * 0.3 + 0.7 * (ruta.compareTo(",") + 1));
+    public float getAptitud() {
+        return aptitud;
     }
 
     /**
@@ -71,34 +110,25 @@ public class Hijo implements Cloneable {
     }
 
     /**
-     * @param peso the peso to set
+     * @return the evaluacion
      */
-    public void setPeso(int peso) {
-        this.peso = peso;
-    }
-
-    /**
-     *
-     * @return @throws CloneNotSupportedException
-     */
-    /**
-     * @return the aptitud
-     */
-    public int getAptitud() {
-        return aptitud;
+    public float getEvaluacion() {
+        return evaluacion;
     }
 
     /**
      * @param aptitud the aptitud to set
      */
-    public void setAptitud(int aptitud) {
+    public void setAptitud(float aptitud) {
         this.aptitud = aptitud;
     }
 
-    @Override
-    public Hijo clone() throws CloneNotSupportedException {
-        Hijo hijo = (Hijo) super.clone();
-        return hijo;
+    public void obtenerInformacion() {
+        String dato = "================= dato Hijo " + cromosoma + " ======================="
+                + "\naptitud: " + aptitud //                + "\npeso " + peso
+                //                + "\nevaluacion: " + evaluacion
+                //                + "\nruta " + ruta;
+                ;
+        //System.out.println(dato);
     }
-
 }
