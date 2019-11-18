@@ -1,9 +1,11 @@
 package GUI;
 
+import clases.Algoritmos;
 import clases.Arista;
 import clases.Genetico;
 import clases.Opcion;
 import clases.Grafo;
+import clases.Hilo;
 import clases.Logica;
 import clases.Nodo;
 import java.awt.Color;
@@ -85,13 +87,25 @@ public class panel_principal extends JPanel implements ActionListener {
         p_grafo.grafo.getV().forEach((nodo) -> {
             nodo.cambiarBinario(p_grafo.grafo.cant_bits);
         });
-        btn_solucionar.setEnabled(false);
-        p_grafo.dibujando = false;
-        Logica logica = new Logica(p_grafo.grafo, p_informacion);
 
+        if (p_grafo.grafo.getV().size() > 3) {
+            btn_solucionar.setEnabled(false);
+            p_grafo.dibujando = false;
+            for (Arista a : p_grafo.grafo.getA()) {
+                a.pintar = false;
+                repaint();
+            }
+            Algoritmos al = new Algoritmos();
+            Hilo h = new Hilo("", al, p_informacion, p_grafo);
+            //al.empezarGenetico();
+            Thread t = new Thread(al);
+            t.start();
+        } else {
+            JOptionPane.showMessageDialog(this, "Cantidad de ciudades insufucientes ", " ERROR ", JOptionPane.ERROR_MESSAGE);
+        }
         // logica.algoritmoGenetico();
-        Genetico g = new Genetico();
-        g.algoritmoGenetico();
+        // Genetico g = new Genetico();
+        //g.algoritmoGenetico();
 
     }
 

@@ -9,8 +9,8 @@ import java.util.Collections;
 
 public class Genetico {
 
-    private final int cantHijos = 8;
-    private final float porcentajeMutacion = 0.15f;
+    private final int cantHijos = 20;
+    private final float porcentajeMutacion = 0.3f;
     private int cantIteraciones = 1000;
 
     private LinkedList<Hijo> hijos;
@@ -136,6 +136,7 @@ public class Genetico {
     private boolean terminar() {
         System.out.println("Porcentaje " + porcentajeCoincidencias() + "%");
         if (porcentajeCoincidencias() >= 85) {
+          
             return true;
         }
         cantIteraciones--;
@@ -258,9 +259,6 @@ public class Genetico {
 //================================= fin de seleccion Ruleta ===================================
 //====================================== Aleatorio ===================================
     private void aleatorizacion() {
-        int[] posiciones = new int[cantHijos];
-        int random = 0;
-        int i = 0;
 
         Collections.shuffle(nuevaGeneracion);
 

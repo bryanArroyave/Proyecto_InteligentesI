@@ -42,6 +42,7 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
         dibujarNodo(new Point(450, 50));
         dibujarNodo(new Point(350, 450));
         dibujarNodo(new Point(50, 350));
+
     }
 
     private void agregarArista(Nodo c) {
@@ -91,9 +92,13 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
     public void paint(Graphics g) {
         super.paint(g);
         grafo.getA().forEach((a) -> {
-            a.dibujar(g);
+          
+                a.dibujar(g);
+                
+        
         });
         grafo.getV().forEach((c) -> {
+
             c.dibujar(g);
         });
 
