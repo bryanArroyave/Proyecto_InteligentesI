@@ -1,7 +1,6 @@
 package GUI;
 
 import java.awt.Toolkit;
-import java.util.Arrays;
 import javax.swing.JFrame;
 
 public class Main extends JFrame {

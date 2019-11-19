@@ -8,8 +8,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -18,7 +16,7 @@ import javax.swing.JPanel;
 
 public class panel_grafo extends JPanel implements MouseListener, MouseMotionListener {
 
-    private int ancho, alto, x, y;
+    public int ancho, alto, x, y;
     public boolean dibujando;
 
     private static int ID = 0;
@@ -32,17 +30,16 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
         this.y = y;
         this.dibujando = true;
         this.siguiente = new Rectangle();
-        this.grafo = new Grafo();
+        grafo = new Grafo();
 
         configurarPanel();
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        dibujarNodo(new Point(50, 50));
-        dibujarNodo(new Point(450, 50));
-        dibujarNodo(new Point(350, 450));
-        dibujarNodo(new Point(50, 350));
-
+//        dibujarNodo(new Point(50, 50));
+//        dibujarNodo(new Point(450, 50));
+//        dibujarNodo(new Point(350, 450));
+//        dibujarNodo(new Point(50, 350));
     }
 
     private void agregarArista(Nodo c) {
@@ -75,7 +72,6 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
             ID++;
             grafo.getV().add(c);
             agregarArista(c);
-            grafo.cambiarMatriz();
             repaint();
             // PanelInformacion.conti.setText(panel_info.conti.getText() + c.getNombre());
         } else {
@@ -84,23 +80,19 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
 
     }
 
-    public Rectangle getSiguiente() {
-        return siguiente;
+    public void dibujar(Graphics g, Grafo grafo) {
+        grafo.getA().forEach((a) -> {
+            a.dibujar(g);
+        });
+        grafo.getV().forEach((c) -> {
+            c.dibujar(g);
+        });
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        grafo.getA().forEach((a) -> {
-          
-                a.dibujar(g);
-                
-        
-        });
-        grafo.getV().forEach((c) -> {
-
-            c.dibujar(g);
-        });
+        dibujar(g, grafo);
 
     }
 
@@ -110,10 +102,6 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
         this.setVisible(true);
         this.setLayout(null);
         this.setBackground(Color.white);
-    }
-
-    public boolean isDibujando() {
-        return dibujando;
     }
 
     public void setSiguiente(Rectangle siguiente) {
@@ -167,5 +155,13 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
     @Override
     public void mouseMoved(MouseEvent me) {
 
+    }
+
+    public Rectangle getSiguiente() {
+        return siguiente;
+    }
+
+    public boolean isDibujando() {
+        return dibujando;
     }
 }

@@ -1,58 +1,72 @@
 package GUI;
 
 import clases.Algoritmos;
+import clases.Archivo;
 import clases.Arista;
-import clases.Genetico;
-import clases.Opcion;
-import clases.Grafo;
 import clases.Hilo;
-import clases.Logica;
-import clases.Nodo;
+import clases.Imagen;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.util.Arrays;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class panel_principal extends JPanel implements ActionListener {
+public class panel_principal extends JPanel implements ActionListener, Runnable {
 
-    panel_informacion p_informacion;
-    panel_grafo p_grafo;
-
-    //private JButton btn_agregarNodo;
+    public panel_grafo p_grafo;
+    ImageIcon fondo;
+    public JLabel porcentaje;
     private JButton btn_solucionar;
-
+    private JLabel label;
     private final int ancho;
     private final int alto;
+    Algoritmos al;
+    Hilo h;
 
     public panel_principal(int ancho, int alto) {
         this.ancho = ancho;
         this.alto = alto;
+        porcentaje = new JLabel("Porncentaje: 0%");
+        configurarLabel(porcentaje, new Rectangle(50, 25, ancho, 25));
 
+        int rand = (int) (Math.random() * 2 + 1);
+        this.fondo = new ImageIcon(getClass().getResource("../Fondo/fondo" + rand + ".gif"));
         inicializarComponentes();
         configurarPanel();
         agregarComponentes();
 
     }
 
+    private void configurarLabel(JLabel label, Rectangle r) {
+        label.setFont(new Font("Arial", 1, 15));
+        label.setForeground(Color.white);
+        label.setBounds(r);
+        label.setVisible(true);
+        add(label);
+        repaint();
+    }
+
     private void inicializarComponentes() {
 
 //================================PANELES===================================================
-        p_grafo = new panel_grafo((3 * (int) ancho / 4) - 300, alto - 125, 50, 50);
-        p_informacion = new panel_informacion((int) ancho / 4, alto, 3 * (int) ancho / 4, 0);
+        p_grafo = new panel_grafo(ancho - 300, alto - 125, 50, 50);
 //================================BOTONES===================================================
 
         btn_solucionar = new JButton();
 
-        btn_solucionar.setBounds((3 * (int) ancho / 4) - 220, (alto / 2) + 50, 25, 25);
+        btn_solucionar.setBounds(ancho - 230, 125, 25, 25);
+        label = new JLabel("Solucionar");
+        label.setFont(new Font("Arial", 1, 15));
+        label.setForeground(Color.white);
+        label.setBounds(ancho - 200, 125, 300, 25);
+        label.setVisible(true);
 
         btn_solucionar.setBackground(Color.red);
 
@@ -69,9 +83,9 @@ public class panel_principal extends JPanel implements ActionListener {
     }
 
     private void agregarComponentes() {
-        add(p_informacion);
         add(p_grafo);
         add(btn_solucionar);
+        add(label);
     }
 
     private void agregarNodo() {
@@ -79,34 +93,35 @@ public class panel_principal extends JPanel implements ActionListener {
     }
 
     private void solucionar() {
-        p_grafo.grafo.calcularMaxPeso();
-        p_grafo.grafo.calcularmaxCantNodos();
+        Imagen imagen2 = new Imagen(p_grafo, "grafo", "src/Consolidado");
+        imagen2.dibujarImagen(panel_grafo.grafo);
+        panel_grafo.grafo.calcularMaxPeso();
+        panel_grafo.grafo.calcularmaxCantNodos();
 
         btn_solucionar.setBackground(Color.green);
-        p_grafo.grafo.calcularCantidadBits();
-        p_grafo.grafo.getV().forEach((nodo) -> {
-            nodo.cambiarBinario(p_grafo.grafo.cant_bits);
+        panel_grafo.grafo.calcularCantidadBits();
+        panel_grafo.grafo.getV().forEach((nodo) -> {
+            nodo.cambiarBinario(panel_grafo.grafo.cant_bits);
         });
 
-        if (p_grafo.grafo.getV().size() > 3) {
+        if (panel_grafo.grafo.getV().size() > 3) {
+
             btn_solucionar.setEnabled(false);
             p_grafo.dibujando = false;
-            for (Arista a : p_grafo.grafo.getA()) {
+            for (Arista a : panel_grafo.grafo.getA()) {
                 a.pintar = false;
                 repaint();
             }
-            Algoritmos al = new Algoritmos();
-            Hilo h = new Hilo("", al, p_informacion, p_grafo);
-            //al.empezarGenetico();
+            al = new Algoritmos();
+            h = new Hilo("", al, this);
+
             Thread t = new Thread(al);
             t.start();
+            new Thread(this).start();
+
         } else {
             JOptionPane.showMessageDialog(this, "Cantidad de ciudades insufucientes ", " ERROR ", JOptionPane.ERROR_MESSAGE);
         }
-        // logica.algoritmoGenetico();
-        // Genetico g = new Genetico();
-        //g.algoritmoGenetico();
-
     }
 
     @Override
@@ -114,6 +129,75 @@ public class panel_principal extends JPanel implements ActionListener {
 
         if (e.getSource() == btn_solucionar) {
             solucionar();
+        }
+    }
+
+    private String[] Desenrutar(String ruta) {
+        if (!ruta.equals("")) {
+
+            return ruta.substring(0, ruta.length() - 1).split(",");
+        }
+        return null;
+
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        g.drawImage(fondo.getImage(), 0, 0, ancho, alto, this);
+        repaint();
+    }
+
+    private void pintarGrafoFinal(String laRuta) {
+        String[] ruta = Desenrutar(laRuta);
+        String o = "", d = "";
+        porcentaje.setText("Porcentaje: " + al.porcentaje + "% " + " iteración: " + al.itecacionActual + " ruta" + Arrays.toString(ruta));
+        for (Arista a : panel_grafo.grafo.getA()) {
+            a.pintar = false;
+            p_grafo.repaint();
+        }
+        for (int i = 0; i < ruta.length - 1; i++) {
+            try {
+                o = panel_grafo.grafo.buscarNodo(ruta[i]).Nombre;
+                d = panel_grafo.grafo.buscarNodo(ruta[i + 1]).Nombre;
+
+                Arista a = p_grafo.grafo.buscarArista(o, d);
+
+                if (a != null) {
+                    a.pintar = true;
+                    p_grafo.repaint();
+                    if (al.itecacionActual != al.CANTIDADITERACIONES) {
+                        a.color = Color.GREEN;
+                    } else {
+                        a.color = Color.BLUE;
+                    }
+                }
+
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    @Override
+    public void run() {
+        while (!al.termino) {
+            System.out.print("");
+        }
+
+        al.termino = true;
+        h.pintar = false;
+        pintarGrafoFinal(al.rutaActual);
+
+        Imagen imagen = new Imagen(p_grafo, "grafoFinal", "src/Consolidado");
+        imagen.dibujarImagen(panel_grafo.grafo);
+
+        Archivo archivo = new Archivo(al.informacion, "", "src/Consolidado/genetico.txt");
+        archivo.LimpiarTxt();
+        archivo.guardarTxt();
+
+        if (JOptionPane.showConfirmDialog(null, "¿Desea ver los resultados consolidados?", "INFORMACION w", JOptionPane.YES_NO_OPTION) == 0) {
+            archivo.Execute();
         }
     }
 

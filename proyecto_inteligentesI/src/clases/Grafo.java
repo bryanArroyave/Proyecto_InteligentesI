@@ -1,6 +1,6 @@
 package clases;
 
-import java.awt.Point;
+
 import java.awt.Rectangle;
 import java.util.LinkedList;
 
@@ -9,7 +9,7 @@ public class Grafo {
     private LinkedList<Nodo> V;
     private LinkedList<Arista> A;
     public int cant_bits;
-    int Matriz[][];
+
 
     public static int maxPeso;
     public static int maxCantNodos;
@@ -18,15 +18,10 @@ public class Grafo {
         cant_bits = 0;
         V = new LinkedList<>();
         A = new LinkedList<>();
-        cambiarMatriz();
 
     }
 
-    public void cambiarMatriz() {
-        Matriz = new int[V.size()][V.size()];
-        llenarMatriz();
-        // mostrarInfo();
-    }
+ 
 
     public void calcularCantidadBits() {
         cant_bits = (int) Math.ceil(Math.log(V.size()) / Math.log(2));
@@ -43,50 +38,17 @@ public class Grafo {
 
     public void calcularmaxCantNodos() {
 
-        this.maxCantNodos = this.V.size();
+        Grafo.maxCantNodos = this.V.size();
 
     }
 
     public void calcularMaxPeso() {
-        int maxPeso = 10;
-        this.maxPeso = (this.V.size() - 1) * maxPeso;
+        int pesoMaximo = 10;
+        Grafo.maxPeso = (this.V.size() - 1) * pesoMaximo;
     }
 
     public int calcularMaximoBits() {
         return cant_bits * V.size();
-    }
-
-    private void llenarMatriz() {
-        for (int i = 0; i < Matriz.length; i++) {
-            for (int j = 0; j < Matriz[i].length; j++) {
-                if (i != j) {
-                    Arista arista = buscarArista("C" + (i), "C" + (j));
-                    if (arista != null) {
-                        Matriz[i][j] = arista.distancia;
-                    }
-                } else {
-                    Matriz[i][j] = -1;
-                }
-            }
-        }
-    }
-
-    public void mostrarInfo() {
-        String dato = "\t";
-
-        for (int i = 0; i < V.size(); i++) {
-            dato += "C" + (i) + "\t";
-        }
-
-        for (int i = 0; i < V.size(); i++) {
-            dato += "\nC" + (i);
-            for (int j = 0; j < V.size(); j++) {
-                dato += "\t" + Matriz[i][j];
-            }
-        }
-        System.out.println("=================================================================================");
-        System.out.println(dato);
-        System.out.println("=================================================================================");
     }
 
     public Arista buscarArista(String o, String d) {

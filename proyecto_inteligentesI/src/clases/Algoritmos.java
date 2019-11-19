@@ -1,20 +1,19 @@
 package clases;
 
 import static GUI.panel_grafo.grafo;
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 public class Algoritmos implements Runnable {
 
     //==================================== CONSTANTES =====================================
-    private final int CANTPOBLACION = 40;
+    private final int CANTPOBLACION = 18;
     private final int MAXBITS;
     private final int CANTBITS;
     private final float PORCENTAJEMUTACION = 0.3f;
+    public final int CANTIDADITERACIONES = 1000;
 
     private final float ALPHA = 2;
     //==================================== VARIABLES =======================================
@@ -24,14 +23,15 @@ public class Algoritmos implements Runnable {
     private String[] nuevaGeneracion;
     public boolean termino;
     public String rutaActual;
-    private int[] costos;
-    private float[] evaluacion;
-    private float[] aptitud;
-    private int[] infactibilidad;
-    private int[] nodosVisitados;
-    private int[] hijos;
+    private final int[] costos;
+    private final float[] evaluacion;
+    private final float[] aptitud;
+    private final int[] infactibilidad;
+    private final int[] nodosVisitados;
+    private final int[] hijos;
+    public String informacion;
 
-    private int CANTIDADITERACIONES = 100000;
+    public int itecacionActual = 0;
 
     public Algoritmos() {
         this.MAXBITS = grafo.calcularMaximoBits();
@@ -47,23 +47,24 @@ public class Algoritmos implements Runnable {
         this.porcentaje = 0;
         this.termino = false;
         this.rutaActual = "";
+        this.informacion = "";
     }
 
     public void empezarGenetico() {
         generarHijos();
 
-        while (CANTIDADITERACIONES > 0) {
+        while (itecacionActual != CANTIDADITERACIONES) {
             for (int i = 0; i < CANTPOBLACION; i++) {
                 this.nodosVisitados[i] = 0;
             }
             seleccionar();
             modificarRuta();
-            System.out.println("Cromosoma\tcosto\tinf\tvis\teva\taptitud\tchijos");
+            this.informacion = "";
             for (int i = 0; i < CANTPOBLACION; i++) {
                 DecimalFormat f = new DecimalFormat("#.000");
-                System.out.println(this.padres[i] + "\t" + this.costos[i]
+                this.informacion += (this.padres[i] + "\t" + this.costos[i]
                         + "\t" + this.infactibilidad[i] + "\t" + this.nodosVisitados[i]
-                        + "\t" + f.format(this.evaluacion[i]) + "\t" + f.format(this.aptitud[i]) + "\t" + this.hijos[i]);
+                        + "\t" + f.format(this.evaluacion[i]) + "\t" + f.format(this.aptitud[i]) + "\t" + this.hijos[i] + "\n");
             }
 
             cruzar();
@@ -75,10 +76,7 @@ public class Algoritmos implements Runnable {
             this.padres = Arrays.copyOf(nuevaGeneracion, CANTPOBLACION);
 
         }
-
-        for (int i = 0; i < CANTPOBLACION; i++) {
-            System.out.println(this.padres[i] + " " + this.nuevaGeneracion[i]);
-        }
+        termino = true;
 
     }
 
@@ -118,49 +116,33 @@ public class Algoritmos implements Runnable {
                 total++;
             }
         }
-//        System.out.println("========================================================");
-//
-//        for (int i = 0; i < CANTPOBLACION; i++) {
-//            System.out.println(nuevaGeneracion[i]);
-//        }
-//        System.out.println("_______________________________________________");
-//        String datos2 = "";
-//        for (int i = 0; i < MAXBITS; i++) {
-//
-//            if (estados[i]) {
-//                datos2 += "1";
-//            } else {
-//                datos2 += "0";
-//            }
-//        }
-//        System.out.println(datos2);
-//        System.out.println("========================================================");
-//        System.out.println();
+
         return (float) total * 100 / MAXBITS;
     }
 
     private boolean terminar() {
-        System.out.println("Porcentaje " + porcentajeCoincidencias() + "%" + " " + CANTIDADITERACIONES);
+      
         porcentaje = porcentajeCoincidencias();
         if (porcentaje >= 95) {
+
             termino = true;
+
             return true;
         }
-        CANTIDADITERACIONES--;
+        itecacionActual++;
         return false;
     }
 
     //============================== GENERAR HIJOS ================================
     private void generarHijos() {
         grafo.calcularCantidadBits();
-//        System.out.println(" po " + CANTPOBLACION + " ma " + MAXBITS);
 
         for (int i = 0; i < CANTPOBLACION; i++) {
             String cromosoma = "";
             for (int j = 0; j < MAXBITS; j++) {
                 cromosoma += (int) (Math.round(Math.random()));
             }
-            System.out.println(cromosoma);
+          
             this.padres[i] = cromosoma;
 
         }
@@ -192,7 +174,7 @@ public class Algoritmos implements Runnable {
         for (int i = 0; i < CANTPOBLACION; i++) {
             hijosRestantes += this.hijos[i];
         }
-        // System.out.println("HIJOS : " + hijosRestantes);
+
         for (int i = 0; i < CANTPOBLACION - hijosRestantes; i++) {
             int pos = escogerHijoRuleta(llenarRuleta());
             this.hijos[pos]++;
@@ -213,7 +195,7 @@ public class Algoritmos implements Runnable {
         for (int i = 0; i < ruleta.length; i++) {
             dato += "|" + ruleta[i] + "|";
         }
-//        System.out.println(dato);
+
         return ruleta;
     }
 
@@ -221,7 +203,6 @@ public class Algoritmos implements Runnable {
 
         int posicion = 0;
         float aleatorio = (float) (Math.random() * ruleta[ruleta.length - 1]);
-//        System.out.println("Aleatorio " + aleatorio);
         for (int i = 0; i < ruleta.length - 1; i++) {
             if (aleatorio > ruleta[i + 1]) {
                 posicion = i + 1;
@@ -274,7 +255,7 @@ public class Algoritmos implements Runnable {
                         this.infactibilidad[pos]++;
                     }
                 } catch (Exception e) {
-                    System.out.println("==================================== o " + o + " d " + d);
+                  
 
                     this.infactibilidad[pos]++;
                 }
@@ -285,11 +266,10 @@ public class Algoritmos implements Runnable {
 
     private void calcularEvaluacion() {
         for (int i = 0; i < CANTPOBLACION; i++) {
-            float pesoNormalizado = ((float) this.costos[i] / (float) grafo.maxPeso);
-            float visitadosNormalizado = ((float) this.nodosVisitados[i]) / (float) grafo.maxCantNodos;
+            float pesoNormalizado = ((float) this.costos[i] / (float) Grafo.maxPeso);
+            float visitadosNormalizado = ((float) this.nodosVisitados[i]) / (float) Grafo.maxCantNodos;
             float infactibilidadNormalizada = (float) ((float) this.infactibilidad[i] / (6 + Math.pow(2, CANTBITS)));
-            System.out.println(" visitados " + visitadosNormalizado + "peso " + pesoNormalizado + " infac " + this.infactibilidad[i] / (6 + Math.pow(2, CANTBITS)));
-
+           
             this.evaluacion[i] = (float) (pesoNormalizado * 0.34 + visitadosNormalizado * 0.33 - infactibilidadNormalizada * 0.33);
         }
     }
@@ -356,9 +336,7 @@ public class Algoritmos implements Runnable {
             auxiliar[i + 1] = c2;
 
         }
-        /*  for (int i = 0; i < CANTPOBLACION; i++) {
-            System.out.println(nuevaGeneracion[i] + " X " + auxiliar[i] + " " + random[i]);
-        }*/
+       
         nuevaGeneracion = Arrays.copyOf(auxiliar, CANTPOBLACION);
 
     }

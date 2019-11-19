@@ -1,19 +1,15 @@
 package clases;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 public class Nodo {
 
     public Rectangle rectangulo;
     public String Nombre;
-    private Color color;
+    private final Color color;
     public String binario;
 
     public Nodo(Rectangle rectangulo, String Nombre) {
@@ -36,7 +32,6 @@ public class Nodo {
         }
         binario = ceros + binario;
 
-       
     }
 
     public boolean comprobarUbicacion(Rectangle c) {
@@ -45,7 +40,6 @@ public class Nodo {
 
     public void dibujar(Graphics g) {
         g.setFont(new Font("Arial Black", 1, 15));
-        // g.drawImage(imagen.getImage(), rectangulo.x, rectangulo.y, null);
         g.setColor(color);
         g.fillOval(rectangulo.x, rectangulo.y, rectangulo.width, rectangulo.height);
         g.setColor(Color.black);
