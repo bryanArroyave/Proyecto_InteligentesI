@@ -5,6 +5,7 @@ import clases.Archivo;
 import clases.Arista;
 import clases.Hilo;
 import clases.Imagen;
+import clases.Sonido;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -33,11 +34,11 @@ public class panel_principal extends JPanel implements ActionListener, Runnable 
     public panel_principal(int ancho, int alto) {
         this.ancho = ancho;
         this.alto = alto;
-        porcentaje = new JLabel("Porncentaje: 0%");
+        porcentaje = new JLabel("Porcentaje: 0%");
         configurarLabel(porcentaje, new Rectangle(50, 25, ancho, 25));
 
         int rand = (int) (Math.random() * 2 + 1);
-        this.fondo = new ImageIcon(getClass().getResource("../Fondo/fondo" + rand + ".gif"));
+        this.fondo = new ImageIcon(getClass().getResource("../Recursos/fondo" + rand + ".gif"));
         inicializarComponentes();
         configurarPanel();
         agregarComponentes();
@@ -181,6 +182,7 @@ public class panel_principal extends JPanel implements ActionListener, Runnable 
 
     @Override
     public void run() {
+
         while (!al.termino) {
             System.out.print("");
         }
@@ -191,12 +193,12 @@ public class panel_principal extends JPanel implements ActionListener, Runnable 
 
         Imagen imagen = new Imagen(p_grafo, "grafoFinal", "src/Consolidado");
         imagen.dibujarImagen(panel_grafo.grafo);
-
-        Archivo archivo = new Archivo(al.informacion, "", "src/Consolidado/genetico.txt");
+        al.calcularCabecera();
+        Archivo archivo = new Archivo(al.informacion + "\n\nRUTA: " + Arrays.toString(Desenrutar(al.rutaActual)), al.cabecera, "src/Consolidado/genetico.txt");
         archivo.LimpiarTxt();
         archivo.guardarTxt();
 
-        if (JOptionPane.showConfirmDialog(null, "¿Desea ver los resultados consolidados?", "INFORMACION w", JOptionPane.YES_NO_OPTION) == 0) {
+        if (JOptionPane.showConfirmDialog(null, "¿Desea ver los resultados consolidados?", "INFORMACION", JOptionPane.YES_NO_OPTION) == 0) {
             archivo.Execute();
         }
     }

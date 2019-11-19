@@ -9,7 +9,7 @@ import java.util.LinkedList;
 public class Algoritmos implements Runnable {
 
     //==================================== CONSTANTES =====================================
-    private final int CANTPOBLACION = 18;
+    private final int CANTPOBLACION = 40;
     private final int MAXBITS;
     private final int CANTBITS;
     private final float PORCENTAJEMUTACION = 0.3f;
@@ -30,7 +30,7 @@ public class Algoritmos implements Runnable {
     private final int[] nodosVisitados;
     private final int[] hijos;
     public String informacion;
-
+    public String cabecera;
     public int itecacionActual = 0;
 
     public Algoritmos() {
@@ -121,7 +121,7 @@ public class Algoritmos implements Runnable {
     }
 
     private boolean terminar() {
-      
+
         porcentaje = porcentajeCoincidencias();
         if (porcentaje >= 95) {
 
@@ -142,10 +142,24 @@ public class Algoritmos implements Runnable {
             for (int j = 0; j < MAXBITS; j++) {
                 cromosoma += (int) (Math.round(Math.random()));
             }
-          
+
             this.padres[i] = cromosoma;
 
         }
+
+    }
+
+    public void calcularCabecera() {
+        int cantTabs = (int) MAXBITS / 7;
+        this.cabecera = "===============================================================================================\n";
+        this.cabecera += "Cromosoma";
+        for (int i = 0; i < cantTabs; i++) {
+            this.cabecera += "\t";
+        }
+        this.cabecera += "Costo\tInfact\tVis\tEval\tAptitud\tC-Hijos\n";
+        this.cabecera += "===============================================================================================\n";
+        System.out.println(this.cabecera);
+        System.out.println(this.informacion);
 
     }
 
@@ -255,7 +269,6 @@ public class Algoritmos implements Runnable {
                         this.infactibilidad[pos]++;
                     }
                 } catch (Exception e) {
-                  
 
                     this.infactibilidad[pos]++;
                 }
@@ -269,7 +282,7 @@ public class Algoritmos implements Runnable {
             float pesoNormalizado = ((float) this.costos[i] / (float) Grafo.maxPeso);
             float visitadosNormalizado = ((float) this.nodosVisitados[i]) / (float) Grafo.maxCantNodos;
             float infactibilidadNormalizada = (float) ((float) this.infactibilidad[i] / (6 + Math.pow(2, CANTBITS)));
-           
+
             this.evaluacion[i] = (float) (pesoNormalizado * 0.34 + visitadosNormalizado * 0.33 - infactibilidadNormalizada * 0.33);
         }
     }
@@ -336,7 +349,7 @@ public class Algoritmos implements Runnable {
             auxiliar[i + 1] = c2;
 
         }
-       
+
         nuevaGeneracion = Arrays.copyOf(auxiliar, CANTPOBLACION);
 
     }
