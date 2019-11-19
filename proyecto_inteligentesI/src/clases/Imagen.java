@@ -35,7 +35,7 @@ public class Imagen {
 
         Graphics g = imagen.getGraphics();
 
-        g.setColor(Color.white);
+        g.setColor(panel.colorFondo);
         g.fillRect(0, 0, panel.ancho, panel.alto);
         panel.dibujar(g, grafo);
 

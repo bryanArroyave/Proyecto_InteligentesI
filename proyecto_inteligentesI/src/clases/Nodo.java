@@ -15,9 +15,9 @@ public class Nodo {
     public Nodo(Rectangle rectangulo, String Nombre) {
         this.rectangulo = rectangulo;
         this.Nombre = Nombre;
-        int R = (int) (Math.random() * 255);
-        int G = (int) (Math.random() * 255);
-        int B = (int) (Math.random() * 255);
+        int R = (int) ((Math.random() * 225) + 30);
+        int G = (int) ((Math.random() * 225) + 30);
+        int B = (int) ((Math.random() * 225) + 30);
         binario = "";
         color = new Color(R, G, B);
 
@@ -42,7 +42,7 @@ public class Nodo {
         g.setFont(new Font("Arial Black", 1, 15));
         g.setColor(color);
         g.fillOval(rectangulo.x, rectangulo.y, rectangulo.width, rectangulo.height);
-        g.setColor(Color.black);
+        g.setColor(Color.white);
         g.drawString(Nombre, -7 + (rectangulo.x) + rectangulo.width / 2, (rectangulo.y) + rectangulo.height / 2 + 3);
     }
 }

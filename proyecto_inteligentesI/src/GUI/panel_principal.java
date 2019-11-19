@@ -5,6 +5,7 @@ import clases.Archivo;
 import clases.Arista;
 import clases.Hilo;
 import clases.Imagen;
+import clases.Nodo;
 import clases.Sonido;
 import java.awt.Color;
 import java.awt.Font;
@@ -13,6 +14,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.LinkedList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -30,6 +32,7 @@ public class panel_principal extends JPanel implements ActionListener, Runnable 
     private final int alto;
     Algoritmos al;
     Hilo h;
+    private final int rand;
 
     public panel_principal(int ancho, int alto) {
         this.ancho = ancho;
@@ -37,7 +40,7 @@ public class panel_principal extends JPanel implements ActionListener, Runnable 
         porcentaje = new JLabel("Porcentaje: 0%");
         configurarLabel(porcentaje, new Rectangle(50, 25, ancho, 25));
 
-        int rand = (int) (Math.random() * 2 + 1);
+        rand = (int) (Math.random() * 2 + 1);
         this.fondo = new ImageIcon(getClass().getResource("../Recursos/fondo" + rand + ".gif"));
         inicializarComponentes();
         configurarPanel();
@@ -57,7 +60,7 @@ public class panel_principal extends JPanel implements ActionListener, Runnable 
     private void inicializarComponentes() {
 
 //================================PANELES===================================================
-        p_grafo = new panel_grafo(ancho - 300, alto - 125, 50, 50);
+        p_grafo = new panel_grafo(ancho - 300, alto - 125, 50, 50, rand);
 //================================BOTONES===================================================
 
         btn_solucionar = new JButton();
@@ -153,7 +156,7 @@ public class panel_principal extends JPanel implements ActionListener, Runnable 
     private void pintarGrafoFinal(String laRuta) {
         String[] ruta = Desenrutar(laRuta);
         String o = "", d = "";
-        porcentaje.setText("Porcentaje: " + al.porcentaje + "% " + " iteración: " + al.itecacionActual + " ruta" + Arrays.toString(ruta));
+        porcentaje.setText("Porcentaje: " + al.porcentaje + "% " + " iteración: " + al.itecacionActual);
         for (Arista a : panel_grafo.grafo.getA()) {
             a.pintar = false;
             p_grafo.repaint();
@@ -171,13 +174,31 @@ public class panel_principal extends JPanel implements ActionListener, Runnable 
                     if (al.itecacionActual != al.CANTIDADITERACIONES) {
                         a.color = Color.GREEN;
                     } else {
-                        a.color = Color.BLUE;
+                        a.color = new Color(52, 186, 186);
                     }
                 }
 
             } catch (Exception e) {
             }
         }
+    }
+
+    private String calcularCantNodosNoVisitados(String[] ruta) {
+        String dato = "";
+        int cant = 0;
+        for (Nodo nodo : panel_grafo.grafo.getV()) {
+            boolean existe = false;
+            for (String r : ruta) {
+                if (nodo.Nombre.equals(r)) {
+                    existe = true;
+                }
+            }
+            if (!existe) {
+                dato += nodo.Nombre + " ";
+                cant++;
+            }
+        }
+        return "[" + cant + "] " + dato;
     }
 
     @Override
@@ -194,7 +215,13 @@ public class panel_principal extends JPanel implements ActionListener, Runnable 
         Imagen imagen = new Imagen(p_grafo, "grafoFinal", "src/Consolidado");
         imagen.dibujarImagen(panel_grafo.grafo);
         al.calcularCabecera();
-        Archivo archivo = new Archivo(al.informacion + "\n\nRUTA: " + Arrays.toString(Desenrutar(al.rutaActual)), al.cabecera, "src/Consolidado/genetico.txt");
+        System.out.println("dato " + calcularCantNodosNoVisitados(Desenrutar(al.rutaActual)));
+
+        String noVisitados = calcularCantNodosNoVisitados(Desenrutar(al.rutaActual));
+        String informacion = al.informacion
+                + "\n\nRUTA: " + Arrays.toString(Desenrutar(al.rutaActual))
+                + "\n\nNODOS NO VISITADOS: " + noVisitados;
+        Archivo archivo = new Archivo(informacion, al.cabecera, "src/Consolidado/genetico.txt");
         archivo.LimpiarTxt();
         archivo.guardarTxt();
 

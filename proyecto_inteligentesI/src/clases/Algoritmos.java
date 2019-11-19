@@ -9,15 +9,14 @@ import java.util.LinkedList;
 public class Algoritmos implements Runnable {
 
     //==================================== CONSTANTES =====================================
-    private final int CANTPOBLACION = 40;
+    private final int CANTPOBLACION = 50;
     private final int MAXBITS;
     private final int CANTBITS;
     private final float PORCENTAJEMUTACION = 0.3f;
-    public final int CANTIDADITERACIONES = 1000;
+    public final int CANTIDADITERACIONES = 100000;
 
     private final float ALPHA = 2;
     //==================================== VARIABLES =======================================
-
     public float porcentaje;
     private String[] padres;
     private String[] nuevaGeneracion;
@@ -123,7 +122,7 @@ public class Algoritmos implements Runnable {
     private boolean terminar() {
 
         porcentaje = porcentajeCoincidencias();
-        if (porcentaje >= 95) {
+        if (porcentaje >= 98) {
 
             termino = true;
 

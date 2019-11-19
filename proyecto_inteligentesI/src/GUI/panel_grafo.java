@@ -22,8 +22,9 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
     private static int ID = 0;
     public static Grafo grafo;
     private Rectangle siguiente;
+    public Color colorFondo;
 
-    public panel_grafo(int ancho, int alto, int x, int y) {
+    public panel_grafo(int ancho, int alto, int x, int y, int rand) {
         this.ancho = ancho;
         this.alto = alto;
         this.x = x;
@@ -32,6 +33,12 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
         this.siguiente = new Rectangle();
         grafo = new Grafo();
 
+        if (rand == 2) {
+            colorFondo = new Color(2, 36, 64);
+
+        } else {
+            colorFondo = new Color(40, 41, 46);
+        }
         configurarPanel();
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -101,7 +108,7 @@ public class panel_grafo extends JPanel implements MouseListener, MouseMotionLis
         this.setLocation(x, y);
         this.setVisible(true);
         this.setLayout(null);
-        this.setBackground(Color.white);
+        this.setBackground(colorFondo);
     }
 
     public void setSiguiente(Rectangle siguiente) {
